@@ -1,4 +1,4 @@
-import tempfile  # Import tempfile to create a temporary directory
+import tempfile
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -25,7 +25,14 @@ driver = webdriver.Chrome(options=chrome_options)
 
 try:
     driver.get("https://www.myrta.com/wps/portal/extvp/myrta/login/")
-    wait = WebDriverWait(driver, 20)
+    wait = WebDriverWait(driver, 20)  # Increased wait time
+
+    # Debugging: Print the page source to see if the page loaded correctly
+    print(driver.page_source)
+
+    # Check if the element is inside an iframe
+    # If it is, switch to the iframe first
+    # driver.switch_to.frame("frame_name_or_id")  # Uncomment and replace with actual frame name or ID if needed
 
     # Use environment variables for license number and password
     license_number = wait.until(EC.visibility_of_element_located((By.ID, "widget_cardNumber")))
