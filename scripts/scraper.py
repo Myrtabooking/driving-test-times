@@ -18,7 +18,15 @@ def setup_driver(headless=False):
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
-    driver = webdriver.Chrome(options=chrome_options)  # Ensure ChromeDriver is in your PATH
+    
+    # Add these new options for GitHub Actions
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-infobars")
+    chrome_options.add_argument("--user-data-dir=/tmp/chrome-data")
+    
+    driver = webdriver.Chrome(options=chrome_options)
     return driver
 
 def login(driver, wait, license_number_str, password_str):
@@ -147,7 +155,7 @@ def main():
         raise ValueError("LICENSE_NUMBER and PASSWORD environment variables must be set")
 
     # Initialize WebDriver
-    driver = setup_driver(headless=False)  # Set headless=True to run without a GUI
+    driver = setup_driver(headless=True)  # Set headless=True to run without a GUI
 
     try:
         # Set up WebDriverWait
