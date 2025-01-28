@@ -2,9 +2,82 @@
 <html>
 <head>
     <title>Driving Test Times NSW</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3757244523108835"
+     crossorigin="anonymous"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Rest of your HTML remains exactly the same -->
+    <div class="container">
+        <h1>Available Driving Test Times NSW</h1>
+        <span id="lastUpdate">Last updated: 2024-01-01 12:00:00</span>
+        
+        <!-- Side banners -->
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-3757244523108835"
+             data-ad-slot="2520879259"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+
+        <div class="locations-grid">
+            <!-- Sample Location Cards -->
+            <div class="location-card" onclick="toggleTiming(this)">
+                <h2>Chatswood</h2>
+                <div class="timing-content">
+                    <div class="day-section">
+                        <h3>Monday</h3>
+                        <p>9:00 AM, 10:30 AM, 2:00 PM</p>
+                    </div>
+                    <div class="day-section">
+                        <h3>Tuesday</h3>
+                        <p>11:00 AM, 1:30 PM</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="location-card" onclick="toggleTiming(this)">
+                <h2>Liverpool</h2>
+                <div class="timing-content">
+                    <div class="day-section">
+                        <h3>Wednesday</h3>
+                        <p>8:30 AM, 9:45 AM</p>
+                    </div>
+                    <div class="day-section">
+                        <h3>Thursday</h3>
+                        <p>10:15 AM, 2:30 PM, 3:45 PM</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="location-card" onclick="toggleTiming(this)">
+                <h2>Blacktown</h2>
+                <div class="timing-content">
+                    <div class="day-section">
+                        <h3>Monday</h3>
+                        <p>8:00 AM, 11:30 AM, 3:00 PM</p>
+                    </div>
+                    <div class="day-section">
+                        <h3>Friday</h3>
+                        <p>9:15 AM, 1:45 PM</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTiming(card) {
+            const timingContent = card.querySelector('.timing-content');
+            timingContent.classList.toggle('active');
+            document.querySelectorAll('.timing-content.active').forEach(content => {
+                if (content !== timingContent) {
+                    content.classList.remove('active');
+                }
+            });
+        }
+    </script>
 </body>
 </html>
