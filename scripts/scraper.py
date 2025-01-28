@@ -138,9 +138,12 @@ def extract_available_times(driver, wait, location_data):
         print(f"Error extracting times: {e}")
 
 def main():
-    # User credentials (ensure these are securely managed in real scenarios)
-    LICENSE_NUMBER = "24148176"
-    PASSWORD = "Secret1234"
+    
+     LICENSE_NUMBER = os.getenv('LICENSE_NUMBER')
+    PASSWORD = os.getenv('PASSWORD')
+
+    if not LICENSE_NUMBER or not PASSWORD:
+        raise ValueError("LICENSE_NUMBER and PASSWORD environment variables must be set")
 
     # Initialize WebDriver
     driver = setup_driver(headless=False)  # Set headless=True to run without a GUI
