@@ -1,1 +1,37 @@
+name: Update Test Times Data
 
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Runs every 6 hours
+  workflow_dispatch:
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    
+    - name: Install dependencies
+      run: |
+        pip install selenium webdriver_manager
+
+    - name: Run scraper
+      env:
+        LICENSE_NUMBER: ${{ secrets.LICENSE_NUMBER }}
+        PASSWORD: ${{ secrets.PASSWORD }}
+      run: |
+        python scripts/scraper.py
+        
+    - name: Commit and push if changed
+      run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git add docs/data.json
+        git commit -m "Update test times data" || exit 0
+        git push
