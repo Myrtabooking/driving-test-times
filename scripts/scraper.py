@@ -140,7 +140,7 @@ def extract_available_times(driver, wait, location_data):
 def main():
     
      LICENSE_NUMBER = os.getenv('LICENSE_NUMBER')
-    PASSWORD = os.getenv('PASSWORD')
+     PASSWORD = os.getenv('PASSWORD')
 
     if not LICENSE_NUMBER or not PASSWORD:
         raise ValueError("LICENSE_NUMBER and PASSWORD environment variables must be set")
