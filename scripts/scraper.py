@@ -23,7 +23,7 @@ chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64
                             "AppleWebKit/537.36 (KHTML, like Gecko) "
                             "Chrome/103.0.5060.114 Safari/537.36")  # Optional: Set a custom user agent
 # Set up the WebDriver
-driver = webdriver.Chrome(options=chrome_options)  # Ensure ChromeDriver is in your PATH
+driver = webdriver.Chrome()  # Ensure ChromeDriver is in your PATH
 
 # Add this after creating the driver
 driver.execute_cdp_cmd('Network.setUserAgentOverride', {"userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36'})
