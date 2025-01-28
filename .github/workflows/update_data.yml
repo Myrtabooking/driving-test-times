@@ -28,16 +28,29 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install selenium
+        pip install selenium==4.9.1
         pip install webdriver_manager
         pip install fake-useragent
         pip install requests
-        pip install beautifulsoup4
-        pip install free-proxy
+
+    - name: Start XVFB
+      run: |
+        sudo apt-get install -y xvfb
+        Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+        echo "DISPLAY=:99" >> $GITHUB_ENV
 
     - name: Run scraper
       env:
         LICENSE_NUMBER: ${{ secrets.LICENSE_NUMBER }}
         PASSWORD: ${{ secrets.PASSWORD }}
+        DISPLAY: :99
       run: |
         python scripts/scraper.py
+        
+    - name: Commit and push if changed
+      run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git add data.json
+        git commit -m "Update test times data" || exit 0
+        git push
