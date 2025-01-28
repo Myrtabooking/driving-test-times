@@ -109,10 +109,80 @@ def extract_available_times(driver, location_data):
     except Exception as e:
         print(f"Error extracting times: {e}")
 
+def process_locations(driver, wait):
+    all_locations_data = {}
+
+    location_dropdown = wait.until(EC.presence_of_element_located((By.ID, "rms_batLocationSelect2")))
+    select = Select(location_dropdown)
+    location_options = select.options
+
+    location_names = [
+        option.text.strip() 
+        for option in location_options 
+        if option.text.strip().lower() != "choose..." and option.is_enabled()
+    ]
+
+    print(f"Found {len(location_names)} locations to process.")
+    print("Locations:", ", ".join(location_names))
+
+    for location_name in location_names:
+        try:
+            print(f"\nProcessing location: {location_name}")
+            location_dropdown = wait.until(EC.presence_of_element_located((By.ID, "rms_batLocationSelect2")))
+            select = Select(location_dropdown)
+            select.select_by_visible_text(location_name)
+
+            next_button = wait.until(EC.element_to_be_clickable((By.ID, "nextButton")))
+            next_button.click()
+
+            time.sleep(1.5)
+
+            location_data = process_weeks(driver, wait)
+            all_locations_data[location_name] = location_data
+
+            back_to_locations_link = wait.until(EC.element_to_be_clickable((By.ID, "anotherLocationLink")))
+            back_to_locations_link.click()
+            time.sleep(2)
+
+        except Exception as e:
+            print(f"An error occurred while processing location '{location_name}': {e}")
+            continue
+
+    return all_locations_data
+
+def process_weeks(driver, wait):
+    location_data = {}
+    no_timeslot_weeks = 0
+
+    while True:
+        extract_available_times(driver, location_data)
+
+        try:
+            alert_dialog = driver.find_element(By.XPATH, "//div[@role='alertdialog']")
+            alert_text = alert_dialog.text
+            if "There are no timeslots available for this week." in alert_text or "There are no timeslots available at this location." in alert_text:
+                no_timeslot_weeks += 1
+                print(f"No timeslots for week. Consecutive weeks with no slots: {no_timeslot_weeks}")
+                if no_timeslot_weeks >= 1:
+                    print("Stopping search for this location after consecutive weeks with no slots.")
+                    break
+        except:
+            no_timeslot_weeks = 0
+
+        try:
+            next_week_button = wait.until(EC.element_to_be_clickable((By.ID, "nextWeekButton")))
+            next_week_button.click()
+            time.sleep(1)
+        except:
+            print("No more weeks available or 'Next week' button not found.")
+            break
+
+    return location_data
+
 def main():
-    driver = create_driver()
-    
+    driver = None
     try:
+        driver = create_driver()
         print("Starting the scraping process...")
         url = "https://www.myrta.com/wps/portal/extvp/myrta/login/"
         
@@ -164,75 +234,7 @@ def main():
         if not location_radio_button.is_selected():
             location_radio_button.click()
 
-        all_locations_data = {}
-
-        while True:
-            location_dropdown = wait.until(EC.presence_of_element_located((By.ID, "rms_batLocationSelect2")))
-            select = Select(location_dropdown)
-            location_options = select.options
-
-            location_names = [
-                option.text.strip() 
-                for option in location_options 
-                if option.text.strip().lower() != "choose..." and option.is_enabled()
-            ]
-
-            print(f"Found {len(location_names)} locations to process.")
-            print("Locations:", ", ".join(location_names))
-
-            for location_name in location_names:
-                try:
-                    print(f"\nProcessing location: {location_name}")
-                    location_dropdown = wait.until(EC.presence_of_element_located((By.ID, "rms_batLocationSelect2")))
-                    select = Select(location_dropdown)
-                    select.select_by_visible_text(location_name)
-
-                    next_button = wait.until(EC.element_to_be_clickable((By.ID, "nextButton")))
-                    next_button.click()
-
-                    time.sleep(1.5)
-
-                    no_timeslot_weeks = 0
-                    location_data = {}
-
-                    while True:
-                        extract_available_times(driver, location_data)
-
-                        try:
-                            alert_dialog = driver.find_element(By.XPATH, "//div[@role='alertdialog']")
-                            alert_text = alert_dialog.text
-                            if "There are no timeslots available for this week." in alert_text or "There are no timeslots available at this location." in alert_text:
-                                no_timeslot_weeks += 1
-                                print(f"No timeslots for week. Consecutive weeks with no slots: {no_timeslot_weeks}")
-                                if no_timeslot_weeks >= 1:
-                                    print("Stopping search for this location after consecutive weeks with no slots.")
-                                    break
-                        except:
-                            no_timeslot_weeks = 0
-
-                        try:
-                            next_week_button = wait.until(EC.element_to_be_clickable((By.ID, "nextWeekButton")))
-                            next_week_button.click()
-                            time.sleep(1)
-                        except:
-                            print("No more weeks available or 'Next week' button not found.")
-                            break
-
-                    all_locations_data[location_name] = location_data
-
-                    try:
-                        back_to_locations_link = wait.until(EC.element_to_be_clickable((By.ID, "anotherLocationLink")))
-                        back_to_locations_link.click()
-                        time.sleep(2)
-                    except:
-                        print("Failed to navigate back to location selection.")
-                        break
-
-                except Exception as e:
-                    print(f"An error occurred while processing location '{location_name}': {e}")
-                    continue
-
-            break
+        all_locations_data = process_locations(driver, wait)
 
         print("\nScraping completed. Summary of results:")
         for location, data in all_locations_data.items():
