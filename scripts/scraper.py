@@ -1,5 +1,5 @@
 import tempfile
-from seleniumwire import webdriver
+import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -22,24 +22,15 @@ chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
 chrome_options.add_experimental_option('useAutomationExtension', False)
 chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36")
 
-# Add custom headers
-wire_options = {
-    'request_headers': {
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'DNT': '1',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1'
-    }
-}
-
-driver = webdriver.Chrome(options=chrome_options, seleniumwire_options=wire_options)
+# Use undetected-chromedriver
+driver = uc.Chrome(options=chrome_options)
 
 try:
     time.sleep(5)  # Add delay before accessing the website
     driver.get("https://www.myrta.com/wps/portal/extvp/myrta/login/")
-    wait = WebDriverWait(driver, 20)  # Increased wait time
+    wait = WebDriverWait(driver, 20)
+
+    # Rest of your code remains the same...
 
     # Debugging: Print the page source to see if the page loaded correctly
     print(driver.page_source)
