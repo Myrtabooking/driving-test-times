@@ -6,17 +6,20 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select
 from fake_useragent import UserAgent
+from fp.fp import FreeProxy
 import time
 import json
 import os
 import random
-from rotating_free_proxies import RotatingFreeProxy
 
 def get_working_proxy():
-    rfp = RotatingFreeProxy()
-    return rfp.get_proxy()
+    try:
+        proxy = FreeProxy(country_id=['US', 'CA', 'AU'], timeout=1).get()
+        return proxy
+    except:
+        return None
 
-def create_driver(proxy=None, retry_count=0):
+def create_driver(retry_count=0):
     if retry_count >= 3:
         raise Exception("Failed to create a working driver after 3 attempts")
 
@@ -43,6 +46,8 @@ def create_driver(proxy=None, retry_count=0):
         chrome_options.add_argument('--window-size=1920,1080')
         chrome_options.add_argument('--start-maximized')
         
+        # Try to get and use a proxy
+        proxy = get_working_proxy()
         if proxy:
             chrome_options.add_argument(f'--proxy-server={proxy}')
 
@@ -54,8 +59,8 @@ def create_driver(proxy=None, retry_count=0):
         
         return driver
     except Exception as e:
-        print(f"Failed to create driver with proxy {proxy}: {str(e)}")
-        return create_driver(get_working_proxy(), retry_count + 1)
+        print(f"Failed to create driver: {str(e)}")
+        return create_driver(retry_count + 1)
 
 def try_access_site(driver, url, max_retries=3):
     for attempt in range(max_retries):
@@ -67,8 +72,7 @@ def try_access_site(driver, url, max_retries=3):
                 print(f"Access denied on attempt {attempt + 1}")
                 if attempt < max_retries - 1:
                     driver.quit()
-                    proxy = get_working_proxy()
-                    driver = create_driver(proxy)
+                    driver = create_driver()
                     continue
             else:
                 return True
@@ -76,22 +80,25 @@ def try_access_site(driver, url, max_retries=3):
             print(f"Error on attempt {attempt + 1}: {str(e)}")
             if attempt < max_retries - 1:
                 driver.quit()
-                proxy = get_working_proxy()
-                driver = create_driver(proxy)
+                driver = create_driver()
                 continue
     return False
 
 def main():
-    proxy = get_working_proxy()
-    driver = create_driver(proxy)
+    driver = create_driver()
     
     try:
+        print("Starting the scraping process...")
         url = "https://www.myrta.com/wps/portal/extvp/myrta/login/"
+        
+        print("Attempting to access the website...")
         if not try_access_site(driver, url):
             raise Exception("Failed to access the site after multiple attempts")
 
+        print("Successfully accessed the website")
         wait = WebDriverWait(driver, 20)
 
+        print("Attempting to login...")
         # Your existing login and scraping code here
         license_number = wait.until(EC.visibility_of_element_located((By.ID, "widget_cardNumber")))
         license_number.send_keys(os.environ['LICENSE_NUMBER'])
@@ -103,12 +110,15 @@ def main():
         
     except Exception as e:
         print(f"An error occurred: {str(e)}")
-        if driver.page_source:
+        if driver:
+            print("\nCurrent URL:", driver.current_url)
+            print("Page Title:", driver.title)
             print("\nPage source at time of error:")
             print(driver.page_source)
         raise
     finally:
-        driver.quit()
+        if driver:
+            driver.quit()
 
 if __name__ == "__main__":
     main()
