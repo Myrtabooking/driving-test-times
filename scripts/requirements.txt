@@ -1,6 +1,0 @@
-selenium
-webdriver_manager
-fake-useragent
-requests
-rotating-free-proxies
-beautifulsoup4
