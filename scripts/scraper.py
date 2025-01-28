@@ -9,22 +9,28 @@ import json
 import os 
 
 chrome_options = Options()
-chrome_options.add_argument("--headless")  # Enables headless mode
-chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
-chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
-chrome_options.add_argument("--window-size=1920,1080")  # Set window size if needed
-chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                            "AppleWebKit/537.36 (KHTML, like Gecko) "
-                            "Chrome/103.0.5060.114 Safari/537.36")  # Optional: Set a custom user agent
+chrome_options.add_argument("--headless=new")  # Updated headless mode
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--window-size=1920,1080")
+chrome_options.add_argument("--start-maximized")
+chrome_options.add_argument("--disable-extensions")
+chrome_options.add_argument("--disable-infobars")
+chrome_options.add_argument('--ignore-certificate-errors')
+chrome_options.add_argument('--allow-running-insecure-content')
+chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+
 # Set up the WebDriver
-driver = webdriver.Chrome(options=chrome_options)  # Ensure ChromeDriver is in your PATH
+driver = webdriver.Chrome(options=chrome_options)
+
 
 try:
     # Open the login page
     driver.get("https://www.myrta.com/wps/portal/extvp/myrta/login/")
 
     # Set up WebDriverWait
-    wait = WebDriverWait(driver, 10)  # Increased wait time for better stability
+    wait = WebDriverWait(driver, 20)  # Increased wait time for better stability
 
     # Wait for the license number field to be visible and enter the license number
     license_number = wait.until(EC.visibility_of_element_located((By.ID, "widget_cardNumber")))
@@ -215,8 +221,6 @@ try:
         for day, times in data.items():
             print(f"  {day}: {', '.join(times)}")
             
-    # After collecting all_locations_data
-    # Save the collected data to a JSON file
     os.makedirs('docs', exist_ok=True)
     with open('docs/data.json', 'w') as f:
         json.dump(all_locations_data, f, indent=4)
