@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3  # Updated to the latest version
+    - uses: actions/checkout@v3
     
     - name: Set up Python
-      uses: actions/setup-python@v4  # Updated to the latest version
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.x'
+        python-version: '3.11'  # Use Python 3.11 for better compatibility
     
     - name: Setup Chrome
       uses: browser-actions/setup-chrome@latest
@@ -28,9 +28,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install selenium==4.9.1
+        pip install selenium
         pip install webdriver_manager
-        pip install undetected-chromedriver
+        pip install requests
+        pip install packaging
 
     - name: Run scraper
       env:
@@ -43,6 +44,6 @@ jobs:
       run: |
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
-        git add data.json  # Ensure this path is correct
+        git add data.json
         git commit -m "Update test times data" || exit 0
         git push
