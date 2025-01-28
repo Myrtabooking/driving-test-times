@@ -1,5 +1,5 @@
 import tempfile
-from selenium import webdriver
+from seleniumwire import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -12,18 +12,32 @@ import os
 user_data_dir = tempfile.mkdtemp()
 
 chrome_options = Options()
-chrome_options.add_argument(f"--user-data-dir={user_data_dir}")  # Set a unique user data directory
-chrome_options.add_argument("--headless")  # Keep this if you want headless mode
+chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
+chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--window-size=1920,1080")
-chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                            "AppleWebKit/537.36 (KHTML, like Gecko) "
-                            "Chrome/103.0.5060.114 Safari/537.36")
+chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+chrome_options.add_experimental_option('useAutomationExtension', False)
+chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36")
 
-driver = webdriver.Chrome(options=chrome_options)
+# Add custom headers
+wire_options = {
+    'request_headers': {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1'
+    }
+}
+
+driver = webdriver.Chrome(options=chrome_options, seleniumwire_options=wire_options)
 
 try:
+    time.sleep(5)  # Add delay before accessing the website
     driver.get("https://www.myrta.com/wps/portal/extvp/myrta/login/")
     wait = WebDriverWait(driver, 20)  # Increased wait time
 
