@@ -7,14 +7,13 @@ from selenium.webdriver.chrome.options import Options
 import time
 import json
 import os 
-# NEW: Add logging import
 import logging
 
 # NEW: Add logging setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-chrome_options = Options(options=chrome_options)
+chrome_options = Options()
 chrome_options.add_argument("--headless")  # Enables headless mode
 chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
 chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
@@ -23,7 +22,7 @@ chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64
                             "AppleWebKit/537.36 (KHTML, like Gecko) "
                             "Chrome/103.0.5060.114 Safari/537.36")  # Optional: Set a custom user agent
 # Set up the WebDriver
-driver = webdriver.Chrome()  # Ensure ChromeDriver is in your PATH
+driver = webdriver.Chrome(options=chrome_options)  # Ensure ChromeDriver is in your PATH
 
 # Add this after creating the driver
 driver.execute_cdp_cmd('Network.setUserAgentOverride', {"userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36'})
