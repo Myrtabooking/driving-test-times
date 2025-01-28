@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import Select  # Import Select for dropdowns
 import time
 import collections
 import json
+import os
 
 def setup_driver(headless=False):
     """
