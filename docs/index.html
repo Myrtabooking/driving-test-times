@@ -22,27 +22,17 @@
              (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
 
-        <div id="debugData"></div> <!-- Add this for debugging -->
         <div class="locations-grid" id="locationsGrid">
             <!-- Locations will be dynamically loaded here -->
         </div>
     </div>
 
     <script>
-        // Function to fetch and display the data
         async function loadTestTimes() {
             try {
-                // Log the full URL we're fetching from
-                console.log('Fetching from:', window.location.href + 'data.json');
-                
                 const response = await fetch('data.json');
                 const data = await response.json();
                 
-                // Debug: Display raw data
-                document.getElementById('debugData').textContent = 
-                    'Raw data: ' + JSON.stringify(data, null, 2);
-                console.log('Fetched data:', data);
-
                 // Update last updated time
                 const now = new Date();
                 document.getElementById('lastUpdate').textContent = 
@@ -52,10 +42,16 @@
                 const locationsGrid = document.getElementById('locationsGrid');
                 locationsGrid.innerHTML = ''; // Clear existing content
 
+                // Sort locations alphabetically
+                const sortedLocations = Object.keys(data).sort();
+
                 // Create a card for each location
-                for (const [location, dates] of Object.entries(data)) {
-                    console.log('Processing location:', location, 'with dates:', dates);
+                for (const location of sortedLocations) {
+                    const dates = data[location];
                     
+                    // Skip if no dates available
+                    if (Object.keys(dates).length === 0) continue;
+
                     const card = document.createElement('div');
                     card.className = 'location-card';
                     card.onclick = function() { toggleTiming(this); };
@@ -66,15 +62,24 @@
                         <div class="timing-content">
                     `;
 
+                    // Sort dates
+                    const sortedDates = Object.keys(dates).sort((a, b) => {
+                        const dateA = parseDate(a);
+                        const dateB = parseDate(b);
+                        return dateA - dateB;
+                    });
+
                     // Add each day's times
-                    for (const [date, times] of Object.entries(dates)) {
-                        console.log('Processing date:', date, 'with times:', times);
-                        cardContent += `
-                            <div class="day-section">
-                                <h3>${date}</h3>
-                                <p>${Array.isArray(times) ? times.join(', ') : times}</p>
-                            </div>
-                        `;
+                    for (const date of sortedDates) {
+                        const times = dates[date];
+                        if (times && times.length > 0) {
+                            cardContent += `
+                                <div class="day-section">
+                                    <h3>${date}</h3>
+                                    <p>${times.join(', ')}</p>
+                                </div>
+                            `;
+                        }
                     }
 
                     cardContent += '</div>';
@@ -83,11 +88,17 @@
                 }
             } catch (error) {
                 console.error('Error loading test times:', error);
-                document.getElementById('debugData').textContent = 
-                    'Error: ' + error.message;
                 document.getElementById('lastUpdate').textContent = 
                     'Error loading data. Please try again later.';
             }
+        }
+
+        // Helper function to parse dates like "Fri 31/01"
+        function parseDate(dateStr) {
+            const [day, date] = dateStr.split(' ');
+            const [dd, mm] = date.split('/');
+            // Assuming all dates are in 2024
+            return new Date(2024, parseInt(mm) - 1, parseInt(dd));
         }
 
         function toggleTiming(card) {
