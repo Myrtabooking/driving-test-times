@@ -15,20 +15,16 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 chrome_options = Options()
-chrome_options.add_argument("--headless=new")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--window-size=1920,1080")
-chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-chrome_options.add_argument('--ignore-certificate-errors')
-chrome_options.add_argument('--allow-running-insecure-content')
-chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-chrome_options.add_experimental_option('useAutomationExtension', False)
-chrome_options.add_argument(f"user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36")
+chrome_options.add_argument("--headless")  # Enables headless mode
+chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
+chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
+chrome_options.add_argument("--window-size=1920,1080")  # Set window size if needed
+chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                            "AppleWebKit/537.36 (KHTML, like Gecko) "
+                            "Chrome/103.0.5060.114 Safari/537.36")  # Optional: Set a custom user agent
+# Set up the WebDriver
+driver = webdriver.Chrome(options=chrome_options)  # Ensure ChromeDriver is in your PATH
 
-# Add this before creating the driver
-driver = webdriver.Chrome(options=chrome_options)
 # Add this after creating the driver
 driver.execute_cdp_cmd('Network.setUserAgentOverride', {"userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36'})
 driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
