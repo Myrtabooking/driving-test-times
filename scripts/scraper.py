@@ -7,6 +7,12 @@ from selenium.webdriver.chrome.options import Options
 import time
 import json
 import os 
+# NEW: Add logging import
+import logging
+
+# NEW: Add logging setup
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 chrome_options = Options()
 chrome_options.add_argument("--headless=new")
@@ -19,17 +25,24 @@ chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64
 # Just this simple driver initialization
 driver = webdriver.Chrome(options=chrome_options)
 
-
 try:
-    # Open the login page
+    # NEW: Add debug log
+    logger.info("Navigating to login page...")
     driver.get("https://www.myrta.com/wps/portal/extvp/myrta/login/")
-    time.sleep(5)  # Add this line to give the page more time to load
+    time.sleep(5)
+
+    # NEW: Add page information logs
+    logger.info("Page title: %s", driver.title)
+    logger.info("Current URL: %s", driver.current_url)
     
     # Set up WebDriverWait
-    wait = WebDriverWait(driver, 30)  # Increased wait time for better stability
+    wait = WebDriverWait(driver, 30)
 
-    # Wait for the license number field to be visible and enter the license number
+    # NEW: Add debug log
+    logger.info("Waiting for license number field...")
     license_number = wait.until(EC.visibility_of_element_located((By.ID, "widget_cardNumber")))
+    # NEW: Add debug log
+    logger.info("License number field found, entering credentials...")
     license_number.send_keys(os.getenv('LICENSE_NUMBER'))
     
     # Wait for the password field to be visible and enter the password
