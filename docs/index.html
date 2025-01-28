@@ -22,6 +22,7 @@
              (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
 
+        <div id="debugData"></div> <!-- Add this for debugging -->
         <div class="locations-grid" id="locationsGrid">
             <!-- Locations will be dynamically loaded here -->
         </div>
@@ -31,9 +32,17 @@
         // Function to fetch and display the data
         async function loadTestTimes() {
             try {
+                // Log the full URL we're fetching from
+                console.log('Fetching from:', window.location.href + 'data.json');
+                
                 const response = await fetch('data.json');
                 const data = await response.json();
                 
+                // Debug: Display raw data
+                document.getElementById('debugData').textContent = 
+                    'Raw data: ' + JSON.stringify(data, null, 2);
+                console.log('Fetched data:', data);
+
                 // Update last updated time
                 const now = new Date();
                 document.getElementById('lastUpdate').textContent = 
@@ -45,8 +54,8 @@
 
                 // Create a card for each location
                 for (const [location, dates] of Object.entries(data)) {
-                    if (Object.keys(dates).length === 0) continue; // Skip locations with no times
-
+                    console.log('Processing location:', location, 'with dates:', dates);
+                    
                     const card = document.createElement('div');
                     card.className = 'location-card';
                     card.onclick = function() { toggleTiming(this); };
@@ -59,10 +68,11 @@
 
                     // Add each day's times
                     for (const [date, times] of Object.entries(dates)) {
+                        console.log('Processing date:', date, 'with times:', times);
                         cardContent += `
                             <div class="day-section">
                                 <h3>${date}</h3>
-                                <p>${times.join(', ')}</p>
+                                <p>${Array.isArray(times) ? times.join(', ') : times}</p>
                             </div>
                         `;
                     }
@@ -73,6 +83,8 @@
                 }
             } catch (error) {
                 console.error('Error loading test times:', error);
+                document.getElementById('debugData').textContent = 
+                    'Error: ' + error.message;
                 document.getElementById('lastUpdate').textContent = 
                     'Error loading data. Please try again later.';
             }
