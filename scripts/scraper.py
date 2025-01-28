@@ -1,45 +1,80 @@
 import tempfile
-import undetected_chromedriver as uc
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 import time
 import json
 import os
 
-# Create a temporary directory for user data
-user_data_dir = tempfile.mkdtemp()
+def create_driver():
+    # Create a temporary directory for user data
+    user_data_dir = tempfile.mkdtemp()
 
-chrome_options = Options()
-chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--window-size=1920,1080")
-chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-chrome_options.add_experimental_option('useAutomationExtension', False)
-chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36")
+    chrome_options = Options()
+    
+    # Anti-detection measures
+    chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option('useAutomationExtension', False)
+    
+    # Required options for GitHub Actions
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--disable-gpu')
+    
+    # Additional options to make the browser more realistic
+    chrome_options.add_argument(f'--user-data-dir={user_data_dir}')
+    chrome_options.add_argument('--window-size=1920,1080')
+    chrome_options.add_argument('--start-maximized')
+    chrome_options.add_argument('--disable-extensions')
+    
+    # Set a realistic user agent
+    chrome_options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
 
-# Use undetected-chromedriver
-driver = uc.Chrome(options=chrome_options)
+    # Create and return the WebDriver instance
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    
+    # Execute CDP commands to make the browser look more realistic
+    driver.execute_cdp_cmd('Network.setUserAgentOverride', {
+        "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    })
+    
+    # Add additional properties to make automation less detectable
+    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    
+    return driver
 
 try:
-    time.sleep(5)  # Add delay before accessing the website
-    driver.get("https://www.myrta.com/wps/portal/extvp/myrta/login/")
+    driver = create_driver()
     wait = WebDriverWait(driver, 20)
 
-    # Rest of your code remains the same...
+    # Add a delay before accessing the website
+    time.sleep(5)
+    
+    print("Accessing website...")
+    driver.get("https://www.myrta.com/wps/portal/extvp/myrta/login/")
+    
+    # Print page title and URL for debugging
+    print(f"Current URL: {driver.current_url}")
+    print(f"Page Title: {driver.title}")
+    
+    # Print any error messages that might appear on the page
+    try:
+        error_messages = driver.find_elements(By.XPATH, "//*[contains(text(), 'error') or contains(text(), 'Error') or contains(text(), 'denied') or contains(text(), 'Denied')]")
+        if error_messages:
+            print("Found error messages on page:")
+            for msg in error_messages:
+                print(msg.text)
+    except:
+        pass
 
-    # Debugging: Print the page source to see if the page loaded correctly
-    print(driver.page_source)
-
-    # Check if the element is inside an iframe
-    # If it is, switch to the iframe first
-    # driver.switch_to.frame("frame_name_or_id")  # Uncomment and replace with actual frame name or ID if needed
-
-    # Use environment variables for license number and password
+    # Rest of your existing code...
     license_number = wait.until(EC.visibility_of_element_located((By.ID, "widget_cardNumber")))
     license_number.send_keys(os.environ['LICENSE_NUMBER'])
 
@@ -173,5 +208,20 @@ try:
         json.dump(all_locations_data, f, indent=4)
     print("Data has been saved to data.json")
 
+except Exception as e:
+    print(f"An error occurred: {str(e)}")
+    # Print the page source when an error occurs
+    try:
+        print("\nPage source at time of error:")
+        print(driver.page_source)
+    except:
+        print("Could not get page source")
+    raise
+
 finally:
-    driver.quit()
+    try:
+        driver.quit()
+    except:
+        pass
+
+
