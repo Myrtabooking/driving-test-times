@@ -9,28 +9,32 @@ import json
 import os 
 
 chrome_options = Options()
-chrome_options.add_argument("--headless=new")  # Updated headless mode
+chrome_options.add_argument("--headless=new")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--window-size=1920,1080")
-chrome_options.add_argument("--start-maximized")
 chrome_options.add_argument("--disable-extensions")
 chrome_options.add_argument("--disable-infobars")
-chrome_options.add_argument('--ignore-certificate-errors')
-chrome_options.add_argument('--allow-running-insecure-content')
+chrome_options.add_argument("--remote-debugging-port=9222")
+chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+chrome_options.binary_location = "/usr/bin/google-chrome"  # Add this line
 chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
-# Set up the WebDriver
-driver = webdriver.Chrome(options=chrome_options)
+# Add this line before creating the driver
+service = webdriver.ChromeService(executable_path="/usr/local/bin/chromedriver")
+
+# Modify the driver creation
+driver = webdriver.Chrome(service=service, options=chrome_options)
 
 
 try:
     # Open the login page
     driver.get("https://www.myrta.com/wps/portal/extvp/myrta/login/")
-
+    time.sleep(5)  # Add this line to give the page more time to load
+    
     # Set up WebDriverWait
-    wait = WebDriverWait(driver, 20)  # Increased wait time for better stability
+    wait = WebDriverWait(driver, 30)  # Increased wait time for better stability
 
     # Wait for the license number field to be visible and enter the license number
     license_number = wait.until(EC.visibility_of_element_located((By.ID, "widget_cardNumber")))
