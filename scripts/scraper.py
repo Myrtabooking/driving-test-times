@@ -281,28 +281,28 @@ def main():
         # Break the outer loop if all locations have been processed
         break
 
-    # Print or store the collected data
-    for location, data in all_locations_data.items():
-        print(f"Data for {location}:")
-        for day, times in data.items():
-            print(f"  {day}: {', '.join(times)}")
-            
-    # After collecting all_locations_data
-    # Save the collected data to a JSON file
-    with open('data.json', 'w') as f:
-        json.dump(all_locations_data, f, indent=4)
-    print("Data has been saved to data.json")
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
-        if driver:
-            print("\nCurrent URL:", driver.current_url)
-            print("Page Title:", driver.title)
-            print("\nPage source at time of error:")
-            print(driver.page_source)
-        raise
-    finally:
-        if driver:
-            driver.quit()
+        # Print or store the collected data
+        for location, data in all_locations_data.items():
+            print(f"Data for {location}:")
+            for day, times in data.items():
+                print(f"  {day}: {', '.join(times)}")
+                
+        # After collecting all_locations_data
+        # Save the collected data to a JSON file
+        with open('data.json', 'w') as f:
+            json.dump(all_locations_data, f, indent=4)
+        print("Data has been saved to data.json")
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+            if driver:
+                print("\nCurrent URL:", driver.current_url)
+                print("Page Title:", driver.title)
+                print("\nPage source at time of error:")
+                print(driver.page_source)
+            raise
+        finally:
+            if driver:
+                driver.quit()
 
-if __name__ == "__main__":
-    main()
+        if __name__ == "__main__":
+            main()
