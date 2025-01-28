@@ -1,3 +1,4 @@
+import tempfile  # Import tempfile to create a temporary directory
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -7,8 +8,12 @@ import time
 import json
 import os
 
+# Create a temporary directory for user data
+user_data_dir = tempfile.mkdtemp()
+
 chrome_options = Options()
-# chrome_options.add_argument("--headless")  # Uncomment this line to run in headless mode
+chrome_options.add_argument(f"--user-data-dir={user_data_dir}")  # Set a unique user data directory
+chrome_options.add_argument("--headless")  # Keep this if you want headless mode
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--window-size=1920,1080")
@@ -20,10 +25,7 @@ driver = webdriver.Chrome(options=chrome_options)
 
 try:
     driver.get("https://www.myrta.com/wps/portal/extvp/myrta/login/")
-    wait = WebDriverWait(driver, 20)  # Increased wait time
-
-    # Debugging: Print the page source to see if the page loaded correctly
-    print(driver.page_source)
+    wait = WebDriverWait(driver, 20)
 
     # Use environment variables for license number and password
     license_number = wait.until(EC.visibility_of_element_located((By.ID, "widget_cardNumber")))
