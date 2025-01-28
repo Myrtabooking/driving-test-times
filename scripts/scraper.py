@@ -1,50 +1,61 @@
-from selenium import webdriver
+from seleniumwire import webdriver  # Changed this import
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import Select  # Import Select for dropdowns
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.options import Options
 import time
 import json
-import os 
+import os
 import logging
 
-# NEW: Add logging setup
+# Add logging setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-chrome_options = Options()
-chrome_options.add_argument("--headless")  # Enables headless mode
-chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
-chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
-chrome_options.add_argument("--window-size=1920,1080")  # Set window size if needed
-chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                            "AppleWebKit/537.36 (KHTML, like Gecko) "
-                            "Chrome/103.0.5060.114 Safari/537.36")  # Optional: Set a custom user agent
-# Set up the WebDriver
-driver = webdriver.Chrome(options=chrome_options)  # Ensure ChromeDriver is in your PATH
+# Selenium Wire options
+seleniumwire_options = {
+    'verify_ssl': False,
+    'suppress_connection_errors': False
+}
 
-# Add this after creating the driver
-driver.execute_cdp_cmd('Network.setUserAgentOverride', {"userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36'})
-driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--window-size=1920,1080")
+chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36")
+
+# Initialize the driver with Selenium Wire
+driver = webdriver.Chrome(
+    options=chrome_options,
+    seleniumwire_options=seleniumwire_options
+)
+
+# Add request interceptor
+def interceptor(request):
+    del request.headers['Referer']  # Delete the referer to help avoid detection
+    request.headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+    request.headers['Accept-Language'] = 'en-US,en;q=0.5'
+
+driver.request_interceptor = interceptor
 
 try:
-    # NEW: Add debug log
+    # Add debug log
     logger.info("Navigating to login page...")
     driver.get("https://www.myrta.com/wps/portal/extvp/myrta/login/")
     time.sleep(5)
 
-    # NEW: Add page information logs
+    # Add page information logs
     logger.info("Page title: %s", driver.title)
     logger.info("Current URL: %s", driver.current_url)
     
     # Set up WebDriverWait
     wait = WebDriverWait(driver, 30)
 
-    # NEW: Add debug log
+    # Add debug log
     logger.info("Waiting for license number field...")
     license_number = wait.until(EC.visibility_of_element_located((By.ID, "widget_cardNumber")))
-    # NEW: Add debug log
     logger.info("License number field found, entering credentials...")
     license_number.send_keys(os.getenv('LICENSE_NUMBER'))
     
