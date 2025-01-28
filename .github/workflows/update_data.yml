@@ -15,7 +15,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'  # Use Python 3.11 for better compatibility
+        python-version: '3.11'
     
     - name: Setup Chrome
       uses: browser-actions/setup-chrome@latest
@@ -30,8 +30,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install selenium
         pip install webdriver_manager
+        pip install fake-useragent
         pip install requests
-        pip install packaging
+        pip install rotating-free-proxies
+        pip install beautifulsoup4
 
     - name: Run scraper
       env:
@@ -39,11 +41,3 @@ jobs:
         PASSWORD: ${{ secrets.PASSWORD }}
       run: |
         python scripts/scraper.py
-        
-    - name: Commit and push if changed
-      run: |
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
-        git add data.json
-        git commit -m "Update test times data" || exit 0
-        git push
