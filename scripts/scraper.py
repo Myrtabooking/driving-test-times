@@ -20,10 +20,18 @@ chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--window-size=1920,1080")
-chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+chrome_options.add_argument('--ignore-certificate-errors')
+chrome_options.add_argument('--allow-running-insecure-content')
+chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+chrome_options.add_experimental_option('useAutomationExtension', False)
+chrome_options.add_argument(f"user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36")
 
-# Just this simple driver initialization
+# Add this before creating the driver
 driver = webdriver.Chrome(options=chrome_options)
+# Add this after creating the driver
+driver.execute_cdp_cmd('Network.setUserAgentOverride', {"userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36'})
+driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
 try:
     # NEW: Add debug log
