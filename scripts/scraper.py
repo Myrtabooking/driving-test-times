@@ -14,7 +14,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-chrome_options = Options()
+chrome_options = Options(options=chrome_options)
 chrome_options.add_argument("--headless")  # Enables headless mode
 chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
 chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
