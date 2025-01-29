@@ -30,27 +30,44 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             padding: 15px;
         }
-        .location-card.no-times {
-            background-color: #ffebee; /* Light red background for locations with no times */
+        .empty-location {
+            background-color: #ffebee !important;
         }
         .timing-content {
             margin-top: 15px;
         }
         .day-section {
             margin-bottom: 10px;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .day-section:last-child {
+            border-bottom: none;
         }
         h2 {
             margin: 0;
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
+            color: #2c5282;
         }
-        .no-times h2 {
-            color: #d32f2f; /* Darker red for the title of locations with no times */
+        .empty-location h2 {
+            color: #d32f2f !important;
         }
         .no-times-message {
             color: #d32f2f;
             font-style: italic;
             margin-top: 10px;
+            text-align: center;
+        }
+        .day-section h3 {
+            color: #4a5568;
+            margin: 5px 0;
+            font-size: 1em;
+        }
+        .day-section p {
+            margin: 5px 0;
+            color: #718096;
+            font-size: 0.9em;
         }
     </style>
 </head>
@@ -85,17 +102,20 @@
                 // Create a card for each location
                 for (const location of sortedLocations) {
                     const dates = data[location];
-                    const hasAvailableTimes = Object.keys(dates).length > 0;
+                    const isEmpty = Object.keys(dates).length === 0;
 
                     const card = document.createElement('div');
-                    card.className = `location-card ${hasAvailableTimes ? '' : 'no-times'}`;
+                    card.className = `location-card ${isEmpty ? 'empty-location' : ''}`;
 
-                    // Create card content
                     let cardContent = `<h2>${location}</h2>`;
 
-                    if (hasAvailableTimes) {
-                        cardContent += `<div class="timing-content">`;
-
+                    if (isEmpty) {
+                        cardContent += `
+                            <div class="no-times-message">
+                                No available times
+                            </div>
+                        `;
+                    } else {
                         // Sort dates
                         const sortedDates = Object.keys(dates).sort((a, b) => {
                             const dateA = parseDate(a);
@@ -115,19 +135,12 @@
                                 `;
                             }
                         }
-
-                        cardContent += '</div>';
-                    } else {
-                        cardContent += `
-                            <div class="no-times-message">
-                                No available times
-                            </div>
-                        `;
                     }
 
                     card.innerHTML = cardContent;
                     locationsGrid.appendChild(card);
                 }
+
             } catch (error) {
                 console.error('Error loading test times:', error);
                 document.getElementById('lastUpdate').textContent = 
