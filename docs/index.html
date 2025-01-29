@@ -2,9 +2,6 @@
 <html>
 <head>
     <title>Driving Test Times NSW</title>
-    <meta name="google-adsense-account" content="ca-pub-3757244523108835">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3757244523108835"
-     crossorigin="anonymous"></script>
     <link rel="stylesheet" href="styles.css">
     <style>
         /* Backup inline styles in case external CSS fails to load */
@@ -42,6 +39,13 @@
         .day-section {
             margin-bottom: 10px;
         }
+        /* Added styles for Buy Me a Coffee button */
+        .bmc-button-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
@@ -52,6 +56,11 @@
         <div class="locations-grid" id="locationsGrid">
             <!-- Locations will be dynamically loaded here -->
         </div>
+    </div>
+
+    <!-- Buy Me a Coffee button container -->
+    <div class="bmc-button-container">
+        <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="AliMehdi" data-color="#FFDD00" data-emoji=""  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
     </div>
 
     <script>
