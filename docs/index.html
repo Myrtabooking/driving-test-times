@@ -31,45 +31,15 @@
             padding: 15px;
             cursor: pointer;
         }
-        .empty-location {
-            background-color: #ffebee !important;
-            cursor: default;
-        }
         .timing-content {
             display: none;
             margin-top: 15px;
-            max-height: 300px;
-            overflow-y: auto;
         }
         .timing-content.active {
             display: block;
         }
         .day-section {
             margin-bottom: 10px;
-        }
-        .empty-location h2 {
-            color: #d32f2f !important;
-        }
-        .no-times-message {
-            color: #d32f2f;
-            font-style: italic;
-            margin-top: 10px;
-            text-align: center;
-        }
-        /* Scrollbar styling */
-        .timing-content::-webkit-scrollbar {
-            width: 8px;
-        }
-        .timing-content::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-        .timing-content::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-        .timing-content::-webkit-scrollbar-thumb:hover {
-            background: #555;
         }
     </style>
 </head>
@@ -104,49 +74,41 @@
                 // Create a card for each location
                 for (const location of sortedLocations) {
                     const dates = data[location];
-                    const isEmpty = Object.keys(dates).length === 0;
+                    
+                    // Skip if no dates available
+                    if (Object.keys(dates).length === 0) continue;
 
                     const card = document.createElement('div');
-                    card.className = `location-card ${isEmpty ? 'empty-location' : ''}`;
-                    if (!isEmpty) {
-                        card.onclick = function() { toggleTiming(this); };
-                    }
+                    card.className = 'location-card';
+                    card.onclick = function() { toggleTiming(this); };
 
                     // Create card content
-                    let cardContent = `<h2>${location}</h2>`;
+                    let cardContent = `
+                        <h2>${location}</h2>
+                        <div class="timing-content">
+                    `;
 
-                    if (isEmpty) {
-                        cardContent += `
-                            <div class="no-times-message">
-                                No available times
-                            </div>
-                        `;
-                    } else {
-                        cardContent += '<div class="timing-content">';
-                        
-                        // Sort dates
-                        const sortedDates = Object.keys(dates).sort((a, b) => {
-                            const dateA = parseDate(a);
-                            const dateB = parseDate(b);
-                            return dateA - dateB;
-                        });
+                    // Sort dates
+                    const sortedDates = Object.keys(dates).sort((a, b) => {
+                        const dateA = parseDate(a);
+                        const dateB = parseDate(b);
+                        return dateA - dateB;
+                    });
 
-                        // Add each day's times
-                        for (const date of sortedDates) {
-                            const times = dates[date];
-                            if (times && times.length > 0) {
-                                cardContent += `
-                                    <div class="day-section">
-                                        <h3>${date}</h3>
-                                        <p>${times.join(', ')}</p>
-                                    </div>
-                                `;
-                            }
+                    // Add each day's times
+                    for (const date of sortedDates) {
+                        const times = dates[date];
+                        if (times && times.length > 0) {
+                            cardContent += `
+                                <div class="day-section">
+                                    <h3>${date}</h3>
+                                    <p>${times.join(', ')}</p>
+                                </div>
+                            `;
                         }
-
-                        cardContent += '</div>';
                     }
 
+                    cardContent += '</div>';
                     card.innerHTML = cardContent;
                     locationsGrid.appendChild(card);
                 }
