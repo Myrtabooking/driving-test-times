@@ -33,7 +33,7 @@
         .empty-location {
             background-color: #ffebee !important;
         }
-        .timing-content {
+        .times-container {
             margin-top: 15px;
         }
         .day-section {
@@ -99,10 +99,16 @@
                 // Sort locations alphabetically
                 const sortedLocations = Object.keys(data).sort();
 
+                // Debug: Log the first location's data
+                console.log("First location data:", data[sortedLocations[0]]);
+
                 // Create a card for each location
                 for (const location of sortedLocations) {
                     const dates = data[location];
                     const isEmpty = Object.keys(dates).length === 0;
+
+                    // Debug: Log location and its data
+                    console.log(`Processing ${location}:`, dates);
 
                     const card = document.createElement('div');
                     card.className = `location-card ${isEmpty ? 'empty-location' : ''}`;
@@ -116,6 +122,8 @@
                             </div>
                         `;
                     } else {
+                        cardContent += '<div class="times-container">';
+                        
                         // Sort dates
                         const sortedDates = Object.keys(dates).sort((a, b) => {
                             const dateA = parseDate(a);
@@ -123,9 +131,15 @@
                             return dateA - dateB;
                         });
 
+                        // Debug: Log sorted dates
+                        console.log(`Sorted dates for ${location}:`, sortedDates);
+
                         // Add each day's times
                         for (const date of sortedDates) {
                             const times = dates[date];
+                            // Debug: Log times for each date
+                            console.log(`Times for ${date}:`, times);
+                            
                             if (times && times.length > 0) {
                                 cardContent += `
                                     <div class="day-section">
@@ -135,6 +149,8 @@
                                 `;
                             }
                         }
+
+                        cardContent += '</div>';
                     }
 
                     card.innerHTML = cardContent;
@@ -149,9 +165,14 @@
         }
 
         function parseDate(dateStr) {
-            const [day, date] = dateStr.split(' ');
-            const [dd, mm] = date.split('/');
-            return new Date(2024, parseInt(mm) - 1, parseInt(dd));
+            try {
+                const [day, date] = dateStr.split(' ');
+                const [dd, mm] = date.split('/');
+                return new Date(2024, parseInt(mm) - 1, parseInt(dd));
+            } catch (error) {
+                console.error('Error parsing date:', dateStr, error);
+                return new Date(0); // Return epoch date if parsing fails
+            }
         }
 
         // Load the data when the page loads
