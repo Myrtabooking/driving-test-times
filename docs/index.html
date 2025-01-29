@@ -29,20 +29,12 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             padding: 15px;
-            height: 400px; /* Fixed height for all cards */
-            display: flex;
-            flex-direction: column;
         }
         .empty-location {
             background-color: #ffebee !important;
-            height: 100px !important; /* Smaller height for empty locations */
         }
-        .day-sections-container {
-            overflow-y: auto;
-            flex-grow: 1;
+        .times-container {
             margin-top: 15px;
-            padding-right: 10px;
-            max-height: 300px;
         }
         .day-section {
             margin-bottom: 10px;
@@ -77,21 +69,6 @@
             color: #718096;
             font-size: 0.9em;
         }
-        /* Scrollbar styling */
-        .day-sections-container::-webkit-scrollbar {
-            width: 8px;
-        }
-        .day-sections-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-        .day-sections-container::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-        .day-sections-container::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
     </style>
 </head>
 <body>
@@ -122,10 +99,16 @@
                 // Sort locations alphabetically
                 const sortedLocations = Object.keys(data).sort();
 
+                // Debug: Log the first location's data
+                console.log("First location data:", data[sortedLocations[0]]);
+
                 // Create a card for each location
                 for (const location of sortedLocations) {
                     const dates = data[location];
                     const isEmpty = Object.keys(dates).length === 0;
+
+                    // Debug: Log location and its data
+                    console.log(`Processing ${location}:`, dates);
 
                     const card = document.createElement('div');
                     card.className = `location-card ${isEmpty ? 'empty-location' : ''}`;
@@ -139,7 +122,7 @@
                             </div>
                         `;
                     } else {
-                        cardContent += '<div class="day-sections-container">';
+                        cardContent += '<div class="times-container">';
                         
                         // Sort dates
                         const sortedDates = Object.keys(dates).sort((a, b) => {
@@ -148,9 +131,15 @@
                             return dateA - dateB;
                         });
 
+                        // Debug: Log sorted dates
+                        console.log(`Sorted dates for ${location}:`, sortedDates);
+
                         // Add each day's times
                         for (const date of sortedDates) {
                             const times = dates[date];
+                            // Debug: Log times for each date
+                            console.log(`Times for ${date}:`, times);
+                            
                             if (times && times.length > 0) {
                                 cardContent += `
                                     <div class="day-section">
@@ -176,9 +165,14 @@
         }
 
         function parseDate(dateStr) {
-            const [day, date] = dateStr.split(' ');
-            const [dd, mm] = date.split('/');
-            return new Date(2024, parseInt(mm) - 1, parseInt(dd));
+            try {
+                const [day, date] = dateStr.split(' ');
+                const [dd, mm] = date.split('/');
+                return new Date(2024, parseInt(mm) - 1, parseInt(dd));
+            } catch (error) {
+                console.error('Error parsing date:', dateStr, error);
+                return new Date(0); // Return epoch date if parsing fails
+            }
         }
 
         // Load the data when the page loads
