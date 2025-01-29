@@ -29,23 +29,34 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             padding: 15px;
-            cursor: pointer;
+            height: 400px; /* Fixed height for all cards */
+            display: flex;
+            flex-direction: column;
         }
         .empty-location {
             background-color: #ffebee !important;
-            cursor: default;
+            height: 100px !important; /* Smaller height for empty locations */
         }
-        .timing-content {
-            display: none;
-            margin-top: 15px;
-            max-height: 300px;
+        .day-sections-container {
             overflow-y: auto;
-        }
-        .timing-content.active {
-            display: block;
+            flex-grow: 1;
+            margin-top: 15px;
+            padding-right: 10px;
+            max-height: 300px;
         }
         .day-section {
             margin-bottom: 10px;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .day-section:last-child {
+            border-bottom: none;
+        }
+        h2 {
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: #2c5282;
         }
         .empty-location h2 {
             color: #d32f2f !important;
@@ -56,19 +67,29 @@
             margin-top: 10px;
             text-align: center;
         }
+        .day-section h3 {
+            color: #4a5568;
+            margin: 5px 0;
+            font-size: 1em;
+        }
+        .day-section p {
+            margin: 5px 0;
+            color: #718096;
+            font-size: 0.9em;
+        }
         /* Scrollbar styling */
-        .timing-content::-webkit-scrollbar {
+        .day-sections-container::-webkit-scrollbar {
             width: 8px;
         }
-        .timing-content::-webkit-scrollbar-track {
+        .day-sections-container::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 4px;
         }
-        .timing-content::-webkit-scrollbar-thumb {
+        .day-sections-container::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 4px;
         }
-        .timing-content::-webkit-scrollbar-thumb:hover {
+        .day-sections-container::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
     </style>
@@ -108,11 +129,7 @@
 
                     const card = document.createElement('div');
                     card.className = `location-card ${isEmpty ? 'empty-location' : ''}`;
-                    if (!isEmpty) {
-                        card.onclick = function() { toggleTiming(this); };
-                    }
 
-                    // Create card content
                     let cardContent = `<h2>${location}</h2>`;
 
                     if (isEmpty) {
@@ -122,7 +139,7 @@
                             </div>
                         `;
                     } else {
-                        cardContent += '<div class="timing-content">';
+                        cardContent += '<div class="day-sections-container">';
                         
                         // Sort dates
                         const sortedDates = Object.keys(dates).sort((a, b) => {
@@ -150,6 +167,7 @@
                     card.innerHTML = cardContent;
                     locationsGrid.appendChild(card);
                 }
+
             } catch (error) {
                 console.error('Error loading test times:', error);
                 document.getElementById('lastUpdate').textContent = 
@@ -161,16 +179,6 @@
             const [day, date] = dateStr.split(' ');
             const [dd, mm] = date.split('/');
             return new Date(2024, parseInt(mm) - 1, parseInt(dd));
-        }
-
-        function toggleTiming(card) {
-            const timingContent = card.querySelector('.timing-content');
-            timingContent.classList.toggle('active');
-            document.querySelectorAll('.timing-content.active').forEach(content => {
-                if (content !== timingContent) {
-                    content.classList.remove('active');
-                }
-            });
         }
 
         // Load the data when the page loads
