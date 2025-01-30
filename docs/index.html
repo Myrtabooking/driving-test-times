@@ -27,16 +27,20 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             padding: 15px;
-            height: 200px; /* Fixed height */
+            height: 400px; /* Default height for cards with data */
             display: flex;
             flex-direction: column;
+        }
+        .location-card.no-times {
+            background-color: #ffebee; /* Light red background */
+            height: 200px; /* Smaller height for empty cards */
         }
         .timing-content {
             flex-grow: 1;
             overflow-y: auto;
             margin-top: 15px;
             padding-right: 10px;
-            display: block; /* Ensure content is visible */
+            display: block;
         }
         .day-section {
             margin-bottom: 10px;
@@ -66,6 +70,11 @@
         }
         p {
             margin: 0;
+        }
+        .no-times-message {
+            color: #d32f2f; /* Darker red for text */
+            font-weight: bold;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -99,36 +108,39 @@
 
                 for (const location of sortedLocations) {
                     const dates = data[location];
-                    
-                    if (Object.keys(dates).length === 0) continue;
+                    const hasAvailableTimes = Object.keys(dates).length > 0;
 
                     const card = document.createElement('div');
-                    card.className = 'location-card';
+                    card.className = `location-card${!hasAvailableTimes ? ' no-times' : ''}`;
 
-                    let cardContent = `
-                        <h2>${location}</h2>
-                        <div class="timing-content">
-                    `;
+                    let cardContent = `<h2>${location}</h2>`;
 
-                    const sortedDates = Object.keys(dates).sort((a, b) => {
-                        const dateA = parseDate(a);
-                        const dateB = parseDate(b);
-                        return dateA - dateB;
-                    });
+                    if (hasAvailableTimes) {
+                        cardContent += '<div class="timing-content">';
+                        
+                        const sortedDates = Object.keys(dates).sort((a, b) => {
+                            const dateA = parseDate(a);
+                            const dateB = parseDate(b);
+                            return dateA - dateB;
+                        });
 
-                    for (const date of sortedDates) {
-                        const times = dates[date];
-                        if (times && times.length > 0) {
-                            cardContent += `
-                                <div class="day-section">
-                                    <h3>${date}</h3>
-                                    <p>${times.join(', ')}</p>
-                                </div>
-                            `;
+                        for (const date of sortedDates) {
+                            const times = dates[date];
+                            if (times && times.length > 0) {
+                                cardContent += `
+                                    <div class="day-section">
+                                        <h3>${date}</h3>
+                                        <p>${times.join(', ')}</p>
+                                    </div>
+                                `;
+                            }
                         }
+
+                        cardContent += '</div>';
+                    } else {
+                        cardContent += '<p class="no-times-message">No available times</p>';
                     }
 
-                    cardContent += '</div>';
                     card.innerHTML = cardContent;
                     locationsGrid.appendChild(card);
                 }
