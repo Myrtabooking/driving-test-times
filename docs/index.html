@@ -27,16 +27,36 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             padding: 15px;
-            cursor: pointer;
+            height: 400px; /* Fixed height */
+            display: flex;
+            flex-direction: column;
         }
         .timing-content {
-            display: none;
+            flex-grow: 1;
+            overflow-y: auto;
             margin-top: 15px;
-        }
-        .timing-content.active {
-            display: block;
+            padding-right: 10px;
         }
         .day-section {
+            margin-bottom: 10px;
+        }
+        /* Styling for the scrollbar */
+        .timing-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .timing-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .timing-content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        .timing-content::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        h2 {
+            margin-top: 0;
             margin-bottom: 10px;
         }
     </style>
@@ -81,7 +101,6 @@
 
                     const card = document.createElement('div');
                     card.className = 'location-card';
-                    card.onclick = function() { toggleTiming(this); };
 
                     // Create card content
                     let cardContent = `
@@ -124,16 +143,6 @@
             const [day, date] = dateStr.split(' ');
             const [dd, mm] = date.split('/');
             return new Date(2024, parseInt(mm) - 1, parseInt(dd));
-        }
-
-        function toggleTiming(card) {
-            const timingContent = card.querySelector('.timing-content');
-            timingContent.classList.toggle('active');
-            document.querySelectorAll('.timing-content.active').forEach(content => {
-                if (content !== timingContent) {
-                    content.classList.remove('active');
-                }
-            });
         }
 
         // Load the data when the page loads
