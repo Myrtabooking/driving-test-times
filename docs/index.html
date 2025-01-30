@@ -36,6 +36,7 @@
             overflow-y: auto;
             margin-top: 15px;
             padding-right: 10px;
+            display: block; /* Ensure content is visible */
         }
         .day-section {
             margin-bottom: 10px;
@@ -59,6 +60,13 @@
             margin-top: 0;
             margin-bottom: 10px;
         }
+        h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        p {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -80,42 +88,34 @@
                 const response = await fetch('data.json');
                 const data = await response.json();
                 
-                // Update last updated time
                 const now = new Date();
                 document.getElementById('lastUpdate').textContent = 
                     `Last updated: ${now.toLocaleString()}`;
 
-                // Get the container for locations
                 const locationsGrid = document.getElementById('locationsGrid');
-                locationsGrid.innerHTML = ''; // Clear existing content
+                locationsGrid.innerHTML = '';
 
-                // Sort locations alphabetically
                 const sortedLocations = Object.keys(data).sort();
 
-                // Create a card for each location
                 for (const location of sortedLocations) {
                     const dates = data[location];
                     
-                    // Skip if no dates available
                     if (Object.keys(dates).length === 0) continue;
 
                     const card = document.createElement('div');
                     card.className = 'location-card';
 
-                    // Create card content
                     let cardContent = `
                         <h2>${location}</h2>
                         <div class="timing-content">
                     `;
 
-                    // Sort dates
                     const sortedDates = Object.keys(dates).sort((a, b) => {
                         const dateA = parseDate(a);
                         const dateB = parseDate(b);
                         return dateA - dateB;
                     });
 
-                    // Add each day's times
                     for (const date of sortedDates) {
                         const times = dates[date];
                         if (times && times.length > 0) {
