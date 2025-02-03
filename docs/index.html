@@ -83,6 +83,10 @@
         <h1>Available Driving Test Times NSW</h1>
         <span id="lastUpdate">Last updated: Loading...</span>
         
+        <div style="margin: 20px 0;">
+            <input type="text" id="searchInput" placeholder="Search locations..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; box-sizing: border-box;">
+        </div>
+
         <div class="locations-grid" id="locationsGrid">
             <!-- Locations will be dynamically loaded here -->
         </div>
@@ -156,6 +160,24 @@
             const [dd, mm] = date.split('/');
             return new Date(2024, parseInt(mm) - 1, parseInt(dd));
         }
+
+        function filterLocations() {
+            const searchInput = document.getElementById('searchInput');
+            const filter = searchInput.value.toLowerCase();
+            const locationCards = document.getElementsByClassName('location-card');
+
+            for (const card of locationCards) {
+                const locationName = card.getElementsByTagName('h2')[0].textContent.toLowerCase();
+                if (locationName.includes(filter)) {
+                    card.style.display = "";
+                } else {
+                    card.style.display = "none";
+                }
+            }
+        }
+
+        // Add event listener to search input
+        document.getElementById('searchInput').addEventListener('input', filterLocations);
 
         // Load the data when the page loads
         document.addEventListener('DOMContentLoaded', loadTestTimes);
